@@ -1,0 +1,10 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <div class="leftcol-wrap slds-col slds-size_1-of-4">
+        <a href="javascript:void(0)" onclick="{!c.redirect}">
+            Click Here to Refresh the Map
+        </a> 
+        <c:AssetlistTesting/>
+    </div><br/>
+    
+    <c:Asset_Map_Testing/> 
+</aura:component>

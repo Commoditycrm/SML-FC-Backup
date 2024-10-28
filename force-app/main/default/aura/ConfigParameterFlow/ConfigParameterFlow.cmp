@@ -1,0 +1,20 @@
+<aura:component controller="Configuration_Parameter_Callout" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:attribute name= "msg" type = "string"/>
+
+    
+    <aura:attribute name="loaded" type="Boolean" default="false" />
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}" />
+    <div class="exampleHolder">
+    <aura:if isTrue="{! v.loaded }">
+            
+            <aura:set attribute="else">
+                <lightning:spinner alternativeText="Loading" />
+            </aura:set>
+        </aura:if>
+    </div>
+     <div align = "center" style = "font-size:20px;">
+      <b><ui:outputText value="{!v.msg}"/></b>  
+          
+    </div>
+    <!--<lightning:flow aura:id="flowData"/> -->
+</aura:component>

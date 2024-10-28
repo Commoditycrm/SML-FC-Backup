@@ -1,0 +1,31 @@
+.form-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 20px;
+}
+
+.custom-layout {
+    display: flex;
+    align-items: center;
+}
+
+.label-container {
+    width: auto;
+    min-width: 80px;
+    padding-right: 5px;
+    margin-top: 20px;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+}
+
+.operator-width {
+    width: 100px; /* Adjust the width as needed */
+    margin-right: 10px;
+}
+
+.value-width {
+    width: 200px; /* Adjust the width as needed */
+}

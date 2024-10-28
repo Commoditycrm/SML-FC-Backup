@@ -1,0 +1,43 @@
+<aura:component controller="BreadCrumbs_Ctrl" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+<aura:attribute name="recordId" type="String" />
+<aura:attribute name="startdate" type="Date" default="" />
+<aura:attribute name="enddate" type="Date" default="" />
+<aura:attribute Name="isShow" type="boolean" default="true"/>
+<aura:attribute name="Spinner" type="boolean" default="false"/>
+ 
+      <lightning:card variant="Narrow" title="" >
+        <aura:if isTrue="{!v.Spinner}"> 
+                <div aura:id="spinnerId" class="slds-spinner_container slds-is-fixed"> <!-- Spinner, Loading -->
+                    <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative " role="status">
+                        <span class="slds-assistive-text">Loading</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div> 
+                        
+                    </div>
+                </div> 
+                
+            </aura:if>
+        <div class="slds-grid slds-grid_vertical-align-start slds-p-left_none">
+        
+            <div class="slds-col slds-p-left--small" style="width:20em">
+             <ui:inputDate aura:id="StartDate" required ="true" labelClass="slds-form-element__label" class="slds-input" displayDatePicker="true" label="Start Date" value="{!v.startdate}"/>
+            </div>&nbsp;&nbsp;&nbsp;&nbsp;
+                
+            <div class="slds-col " style="width:20em">
+             <ui:inputDate aura:id="EndDate" required ="true" labelClass="slds-form-element__label" class="slds-input" displayDatePicker="true" label="End Date" value="{!v.enddate}"/>
+            </div>&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+                
+            
+            <div class="slds-col slds-p-top--large" style="width:20em">
+                <div align="center">
+              <lightning:button variant="brand" label="Show" title="Show" onclick="{!c.validation}">Show</lightning:button>
+                </div>
+            </div>
+                
+        </div>
+        
+    </lightning:card><br/>
+   
+        <c:LeafletForSmartTracks/>
+</aura:component>

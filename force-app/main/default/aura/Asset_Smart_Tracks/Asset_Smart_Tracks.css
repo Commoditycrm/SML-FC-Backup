@@ -1,0 +1,40 @@
+.THIS.ErrorWarning {
+  	padding: 7px;
+    background-color: #c23934;
+    color: white;
+    display: none;
+    width: 60%;
+    height: 50px;
+    margin-left: 110px;   
+    font-weight: 300;
+    border-radius: .25rem;
+    text-align: left;
+}
+
+.THIS.WarningAlert {
+  	padding: 7px;
+    background-color: #ffb75d;
+    color: #080707;
+    display: none;
+    width: 60%;
+    height: 50px;
+    margin-left: 110px;   
+    font-weight: 300;
+    border-radius: .25rem;
+    text-align: left;
+}
+
+.THIS .closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 32px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.THIS .closebtn:hover {
+          color: black;
+        }

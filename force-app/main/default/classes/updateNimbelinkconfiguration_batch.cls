@@ -1,0 +1,315 @@
+global class updateNimbelinkconfiguration_batch implements Database.Batchable<sObject>,Database.AllowsCallouts, Database.Stateful {
+    List<Id> assetIds;
+    String batchName;
+    
+    public DateTime batchStartTime;
+    public Integer totalRecords;
+    public Integer totalFailureRecords;
+    public List<String> failureMsgs;
+    
+    public updateNimbelinkconfiguration_batch(List<Id> assetIds,String batchName){
+        this.batchName = batchName;
+        this.assetIds = assetIds;
+        
+        this.batchStartTime = system.Now();
+        this.totalRecords = this.totalFailureRecords = 0;
+        this.failureMsgs = new List<String>();
+    }
+    
+    public Database.QueryLocator start(Database.BatchableContext bc){
+        String query = 'SELECT Id,name,Device_id__c,Measurement_Period_desired__c,Measurement_Period_Reported__c,Config_Check_Reported__c,';
+        query+= 'Accelerometer_Status_Desired__c, Trackmode_Desired__c, ConnectMovementStart_Desired__c, ConnectMovementEnd_Desired__c,';
+        query+= 'Tracking_Locations_per_Check_Ins_Desired__c, Tracking_Location_Period_Desired__c,Location_Sampling_Period_Desired__c, ';
+        query+= 'Location_Status_Desired__c, Use_Cell_Desired__c, Use_GPS_Desired__c, Use_Wifi_Desired__c, Temperature_Check_in_Period_Desired__c, ';
+        query+= 'Temperature_Status_Desired__c, Network_Check_in_period_Desired__c FROM Asset ';
+        query+= 'WHERE Id IN:assetIds AND (Accelerometer_Status_Check__c=false OR Trackmode_check__c=false OR ';
+        query+= 'ConnectMovementStart_Check__c=false OR Location_Sampling_Period_check__c=false OR Location_Status_Check__c=false ';
+        query+= 'OR Use_Gps_check__c=false OR Use_Cell_Check__c=false OR Use_Wifi_Check__c=false OR Temperature_Status_Check__c=false '; 
+        query+= 'OR Temperature_Check_in_Period_Check__c=false OR Network_Check_in_period_chek__c=false ';
+        query+= 'OR Tracking_Location_Period_Check__c=false OR ConnectMovementEnd_Check__c=false OR Tracking_Locations_per_Check_Ins_check__c=false ';
+        query+= 'OR Measurement_Period_Check__c=false ';
+        query+= 'OR Connect_On_Tilt_Check__c=false OR Tilt_Degrees_Check__c=false OR Log_Every_n_Check__c=false OR Reference_X_Check__c=false OR Reference_Y_Check__c=false OR Reference_Z_Check__c=false)';
+        return Database.getQuerylocator(query);
+    }
+    public void execute(Database.BatchableContext bc,List<Asset> assets){
+        totalRecords += assets.size();
+        
+        try{
+            List<asset> assetstoUpdate = new List<asset>();
+            for(asset asts : assets){
+                string response;
+                string assetid;
+                string deviceId = asts.Device_Id__c;
+                string token = Utilityclass.generatetoken();
+                HttpResponse res =new HttpResponse();
+                assetid=asts.Id;
+                try{
+                    string authorize = 'Bearer'+' '+ token;
+                    Http h1 = new Http();
+                    HttpRequest req = new HttpRequest();
+                    req.setTimeout(60000);
+                    req.setMethod('GET');
+                    req.setHeader('content-type','application/json');
+                    req.setHeader('x-api-key', 'c4X3jIqTbzakxQe3OreSk12co0D4QcRIWq1SLQ34'); 
+                    req.setHeader('Authorization', authorize); 
+                    string endpt = 'https://api.iot.nimbelink.net/v1/devices/'+deviceId+'/config';
+                    // system.debug(endpt);    
+                    req.setEndpoint(endpt);
+                    //  system.debug('qqqq'+req);
+                    res=h1.send(req);
+                    if (res.getStatusCode()==200){
+                        assetstoUpdate.add(asts);
+                        response=res.getBody();
+                        //  system.debug('res---'+response);
+                        
+                        map<string,Object> lst_JsonParse = new map<string,Object>();
+                        if(res.getBody() != null)
+                            lst_JsonParse = (map<string,Object>)Json.deserializeUntyped(res.getBody()); 
+                        //  system.debug('parse--'+lst_JsonParse);
+                        map<string,object> configMap = new map<string,object>();
+                        if(lst_JsonParse.containskey('config')){
+                            configMap = (map<string,object>) lst_JsonParse.get('config');
+                            //     system.debug('configMap---'+configMap);    
+                        }
+                        
+                        //Newly Added
+                        System.debug('Config Reported Flag'+asts.Config_Check_Reported__c);
+                        if(asts.Config_Check_Reported__c)
+                            updateConfigparams(asts,configMap);
+                        map<string,object> desiredMap = new map<string,object>();
+                        if(configMap.containskey('reported')){
+                            desiredMap = (map<string,object>) configMap.get('reported');
+                            //  system.debug('desiredMap---'+desiredMap);    
+                        }
+                        
+                        map<string,object> accelMap = new map<string,object>();
+                        map<string,object> trackmap = new map<string,object>();
+                        map<string, object> tiltReportedMap = new map<string, object>();
+                        
+                        if(desiredMap.containskey('accelerometer')){
+                            accelMap = (map<string,object>) desiredMap.get('accelerometer');
+                            trackmap =(map<string,object>)accelMap.get('tracking');
+                            tiltReportedMap =(map<string,object>)accelMap.get('tilt');
+                            // system.debug('accelMap---'+accelMap); 
+                            // system.debug('trackmap---'+trackmap);
+                            // system.debug('tiltReportedMap---'+ tiltReportedMap);
+                            if(string.valueof(accelMap.get('enabled')) != null)
+                                asts.Accelerometer_Status_Desired__c =string.valueof(accelMap.get('enabled'));
+                            else
+                                asts.Accelerometer_Status_Desired__c = 'false';   
+                            if(accelMap.containskey('mode'))
+                                asts.Trackmode_Desired__c=string.valueof(accelMap.get('mode'));
+                            if(accelMap.containskey('measurement_period'))
+                                asts.Measurement_Period_Reported__c=string.valueof(accelMap.get('measurement_period'));
+                            if(string.valueof(trackmap.get('connect_on_movement_start')) != null)
+                                asts.ConnectMovementStart_Desired__c=string.valueof(trackmap.get('connect_on_movement_start'));
+                            else
+                                asts.ConnectMovementStart_Desired__c = 'false';
+                            if(string.valueof(trackmap.get('connect_on_movement_end')) != null)
+                                asts.ConnectMovementEnd_Desired__c=string.valueof(trackmap.get('connect_on_movement_end'));
+                            else
+                                asts.ConnectMovementEnd_Desired__c='false';   
+                            if(trackmap.containskey('locations_per_checkin'))
+                                asts.Tracking_Locations_per_Check_Ins_Desired__c=string.valueof(trackmap.get('locations_per_checkin'));
+                            if(trackmap.containskey('location_period'))
+                                asts.Tracking_Location_Period_Desired__c=string.valueof(trackmap.get('location_period'));
+                            if (tiltReportedMap.containsKey('degrees')) {
+                                asts.Tilt_Degrees_Reported__c = (Decimal) tiltReportedMap.get('degrees');
+                            }
+                            if (tiltReportedMap.containsKey('connect_on_tilt')) {
+                                asts.Connect_On_Tilt_Reported__c = string.valueof(tiltReportedMap.get('connect_on_tilt'));
+                            }
+                            if (tiltReportedMap.containsKey('log_every_n')) {
+                                asts.Log_Every_n_Reported__c = (Decimal) tiltReportedMap.get('log_every_n');
+                            }
+                            if (tiltReportedMap.containsKey('reference_x')) {
+                                system.debug('tiltReported x '+ tiltReportedMap.get('reference_x'));
+                                asts.Reference_X_Reported__c = (Decimal) tiltReportedMap.get('reference_x');
+                            }
+                            if (tiltReportedMap.containsKey('reference_y')) {
+                                system.debug('tiltReported y '+ tiltReportedMap.get('reference_y'));
+                                asts.Reference_Y_Reported__c = (Decimal) tiltReportedMap.get('reference_y');
+                            }
+                            if (tiltReportedMap.containsKey('reference_z')) {
+                                system.debug('tiltReported z '+ tiltReportedMap.get('reference_z'));
+                                asts.Reference_Z_Reported__c = (Decimal) tiltReportedMap.get('reference_z');
+                            }
+                            
+                        } 
+                        //  System.debug('Track loc period Reported : '+string.valueof(trackmap.get('location_period')));//added 25-11-2021
+                        map<string,object> locMap = new map<string,object>();
+                        if(desiredMap.containskey('location')){
+                            locMap = (map<string,object>) desiredMap.get('location');
+                            if(locMap.containskey('sampling_period'))
+                                asts.Location_Sampling_Period_Desired__c=string.valueof(locMap.get('sampling_period'));
+                            if(string.valueof(locMap.get('enabled')) != null)
+                                asts.Location_Status_Desired__c=string.valueof(locMap.get('enabled'));
+                            else
+                                asts.Location_Status_Desired__c = 'false';    
+                            //use cell
+                            if(string.valueof(locMap.get('useCell')) != null)
+                                asts.Use_Cell_Desired__c =string.valueof(locMap.get('useCell'));
+                            else
+                                asts.Use_Cell_Desired__c = 'false';   
+                            //use gps
+                            if(string.valueof(locMap.get('useGPS')) != null)
+                                asts.Use_GPS_Desired__c =string.valueof(locMap.get('useGPS'));
+                            else
+                                asts.Use_GPS_Desired__c = 'false';  
+                            //use wifi
+                            if(string.valueof(locMap.get('useWiFi')) != null)
+                                asts.Use_Wifi_Desired__c =string.valueof(locMap.get('useWiFi'));
+                            else
+                                asts.Use_Wifi_Desired__c = 'false';   
+                        }
+                        
+                        map<string,object> networkMap = new map<string,object>();
+                        if(desiredMap.containskey('network')){
+                            networkMap = (map<string,object>) desiredMap.get('network');
+                            if(networkMap.containskey('period'))
+                                asts.Network_Check_in_period_Desired__c =string.valueof(networkMap.get('period'));
+                            
+                        }
+                        
+                        map<string,object> tempMap = new map<string,object>();
+                        if(desiredMap.containskey('temperature')){
+                            tempMap = (map<string,object>) desiredMap.get('temperature');
+                            if(string.valueof(tempMap.get('enabled')) != null)
+                                asts.Temperature_Status_Desired__c =string.valueof(tempMap.get('enabled'));
+                            else
+                                asts.Temperature_Status_Desired__c = 'false';  
+                            if(tempMap.containskey('sampling_period'))
+                                asts.Temperature_Check_in_Period_Desired__c =string.valueof(tempMap.get('sampling_period'));
+                            
+                        }
+                        
+                        //For BLE Configuration 
+                        map<string,object> BLEMap = new map<string,object>();
+                        
+                        //END
+                        //
+                    }
+                    else {system.debug('Error response received');}
+                }
+                catch(exception ex){
+                    Utilityclass.sendemailtoadmin(ex); 
+                } 
+            }
+            
+            system.debug('===assetstoUpdate=='+ assetstoUpdate);
+            if(!assetstoUpdate.isEmpty()){
+                update assetstoUpdate; 
+            }
+        } catch(Exception exp) {
+            failureMsgs.add(exp.getMessage());
+            totalFailureRecords = totalFailureRecords + 1;
+        }
+    }
+    public void finish(Database.BatchableContext bc){
+        if(!Test.isRunningTest()){
+            //Database.executeBatch(new updatecurrentaddress_Batch(this.assetIds, this.batchName), 1);
+            Database.executeBatch(new storeLocationRecord(this.assetIDs,batchName),1);
+        }
+        
+        Batch_Data_Custom__c batchLog = new Batch_Data_Custom__c();
+        batchLog.Batch_Name__c = this.batchName;
+        batchLog.Start_Time__c= batchStartTime;
+        batchLog.Complete_Time__c = system.now();
+        batchLog.Error_msg__c = String.join(failureMsgs, '\n');
+        batchLog.Failure_records__c = totalFailureRecords ;
+        batchLog.Status__c = 'Completed';
+        batchLog.Total_no_of_records_processed__c = totalRecords;
+        insert batchLog;
+    }
+    public static void updateConfigparams(asset asts,map<string,object> configMap ){
+        
+        map<string,object> desiredMap = new map<string,object>();
+        if(configMap.containskey('desired')){
+            desiredMap = (map<string,object>) configMap.get('desired');  
+        }
+        
+        map<string,object> accelMap = new map<string,object>();
+        map<string,object> trackmap = new map<string,object>();
+        map<string, object> tiltMap = new map<string, object>();
+        
+        if(desiredMap.containskey('accelerometer')){
+            accelMap = (map<string,object>) desiredMap.get('accelerometer');
+            trackmap =(map<string,object>)accelMap.get('tracking');
+            tiltMap =(map<string,object>)accelMap.get('tilt');
+            if(accelMap.containskey('enabled'))
+                asts.Accel_Enabled__c =string.valueof(accelMap.get('enabled'));
+            if(accelMap.containskey('mode'))
+                asts.Trackmode__c=string.valueof(accelMap.get('mode')); 
+            if(accelMap.containskey('measurement_period'))
+                asts.Measurement_Period_desired__c=string.valueof(accelMap.get('measurement_period'));
+            if(trackmap != null){
+                if(trackmap.containskey('connect_on_movement_start'))
+                    asts.ConnectMovementStart__c=string.valueof(trackmap.get('connect_on_movement_start'));
+                if(trackmap.containskey('connect_on_movement_end'))
+                    asts.ConnectMovementEnd__c=string.valueof(trackmap.get('connect_on_movement_end'));
+                if(trackmap.containskey('locations_per_checkin'))
+                    asts.Locations_per_Check_Ins__c=string.valueof(trackmap.get('locations_per_checkin'));
+                if(trackmap.containskey('location_period'))
+                    asts.LocationPeriod__c=string.valueof(trackmap.get('location_period'));    
+                
+            }
+            if(tiltMap != null){
+                if (tiltMap.containsKey('degrees')) {
+                    asts.Tilt_Degrees_Desired__c = (Decimal)tiltMap.get('degrees');
+                }
+                if (tiltMap.containsKey('connect_on_tilt')) {
+                    asts.Connect_On_Tilt_Desired__c = string.valueof(tiltMap.get('connect_on_tilt'));
+                }
+                if (tiltMap.containsKey('log_every_n')) {
+                    asts.Log_Every_n_Desired__c = (Decimal)tiltMap.get('log_every_n');
+                }
+                if (tiltMap.containsKey('reference_x')) {
+                    asts.Reference_X_Desired__c = (Decimal)tiltMap.get('reference_x');
+                }
+                if (tiltMap.containsKey('reference_y')) {
+                    asts.Reference_Y_Desired__c = (Decimal)tiltMap.get('reference_y');
+                }
+                if (tiltMap.containsKey('reference_z')) {
+                    asts.Reference_Z_Desired__c = (Decimal)tiltMap.get('reference_z');
+                }
+            }            
+        } 
+        map<string,object> locMap = new map<string,object>();
+        if(desiredMap.containskey('location')){
+            locMap = (map<string,object>) desiredMap.get('location');
+            if(locMap.containskey('sampling_period'))
+                asts.Sampling_Period__c=string.valueof(locMap.get('sampling_period'));
+            if(locMap.containskey('enabled'))  
+                asts.Loc_Enabled__c=string.valueof(locMap.get('enabled'));
+            if(locMap.containskey('useCell'))
+                asts.Use_Cell__c =string.valueof(locMap.get('useCell'));
+            if(locMap.containskey('useGPS'))
+                asts.Use_GPS__c =string.valueof(locMap.get('useGPS'));
+            if(locMap.containskey('useWiFi'))
+                asts.Use_WiFi__c     =string.valueof(locMap.get('useWiFi'));
+            
+        }
+        
+        map<string,object> networkMap = new map<string,object>();
+        if(desiredMap.containskey('network')){
+            networkMap = (map<string,object>) desiredMap.get('network');
+            if(networkMap.containskey('period'))
+                asts.Check_in_period__c =string.valueof(networkMap.get('period'));
+            
+        }
+        
+        map<string,object> tempMap = new map<string,object>();
+        if(desiredMap.containskey('temperature')){
+            tempMap = (map<string,object>) desiredMap.get('temperature');
+            if(tempMap.containskey('enabled'))
+                asts.Temp_Enabled__c =string.valueof(tempMap.get('enabled'));
+            if(tempMap.containskey('sampling_period'))
+                asts.Temperature_Check_in_Period__c =string.valueof(tempMap.get('sampling_period'));
+            
+        }
+        //FOR BLE Enabled 
+        map<string,object> bleMap = new map<string,object>();
+        
+        
+    }
+}

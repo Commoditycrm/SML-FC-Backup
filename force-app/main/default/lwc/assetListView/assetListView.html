@@ -1,0 +1,31 @@
+<template>
+    <div class="slds-m-around_medium">
+        <a href="javascript:void(0);" onclick={toggleFilterVisibility} class="toggle-filter-link">Create a List View</a>
+        <template if:true={showFilter}>
+            <div class="form-container">
+                <div class="slds-col slds-size_1-of-2 slds-p-horizontal_x-small">
+                    <lightning-input label="List View Name" value={assetStatus} onchange={handleInputChange} data-id="assetStatus" required></lightning-input>
+                </div>
+
+                <!-- Asset Type Field -->
+                <div class="form-item-group custom-layout">
+                    <div class="label-container">
+                        <label for="assetType">Asset Type:</label>
+                    </div>
+                    <div class="input-container">
+                        <lightning-combobox class="operator-width" value={assetTypeOperator} placeholder="Operator" 
+                                            options={typeoperatorOptions} onchange={handleOperatorChange} data-id="assetTypeOperator">
+                        </lightning-combobox>
+                        <lightning-input class="value-width" value={assetType} onchange={handleInputChange} data-id="assetType"></lightning-input>
+                    </div>
+                </div>
+                
+            </div>
+&nbsp;
+            <div class="button-container">
+                <lightning-button label="Save" onclick={handleCreateRecord} class="slds-button_neutral slds-m-right_small"></lightning-button>
+                <lightning-button label="Cancel" onclick={toggleFilterVisibility} class="slds-button_neutral"></lightning-button>
+            </div>
+        </template>
+    </div>
+</template>

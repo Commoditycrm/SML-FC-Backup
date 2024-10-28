@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event template" >
+    <aura:attribute name = "asset" Type = "Asset"/>
+    <aura:attribute name = "account" Type = "Account"/>	
+</aura:event>

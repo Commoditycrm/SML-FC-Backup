@@ -1,0 +1,3 @@
+<aura:component implements="flexipage:availableForAllPageTypes">
+    <lightning:button variant="brand" label="Open Inventory Managment" title="Brand action" onclick="{! c.handleClick }" />
+</aura:component>

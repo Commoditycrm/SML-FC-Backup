@@ -1,0 +1,27 @@
+<aura:component controller = "AssetLightningController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <ltng:require styles="{!$Resource.LeafletMarkerCluster + '/Leaflet.markercluster/dist/MarkerCluster.css'}" />
+    <ltng:require styles="{!$Resource.LeafletMarkerCluster + '/Leaflet.markercluster/dist/MarkerCluster.Default.css'}" />  
+    <ltng:require styles="{!$Resource.leaflet + '/leaflet/leaflet.css'}" />
+    <ltng:require scripts="{!join(',',$Resource.leaflet + '/leaflet/leaflet.js', $Resource.MarkerCluster)}" afterScriptsLoaded="{!c.jsLoaded}" />
+    
+    <aura:attribute name="map1" type="Object" default="null"/>
+    <aura:attribute name="latitude" type="decimal"/>
+    <aura:attribute name="longitude" type="decimal"/>
+    <aura:attribute name="userLanguage" type="String" />
+     <aura:attribute name="MapView" type="String" />
+     <aura:attribute name="SatelliteView" type="String" />
+  
+    <aura:attribute name="isMapLoaded" type="Boolean" default="false"/>
+    <!--<aura:handler name="change" value="{!v.isMapLoaded}" action="{!c.getuserLatLng}"/>-->
+    <aura:handler name = "init" value = "{!this}"  action="{!c.getuserLatLng}"/>
+    <aura:handler event="c:eventforbreadcrumbs1" action="{!c.loadAsset}"/>
+    <!-- aura:handler name = "init" value = "{!this}" action = "{!c.getuserLatLng}"/ -->
+    <div class="slds-size_1-of-6" >
+        <lightning:button variant="brand" label="{!v.SatelliteView}" title="Satellite View" onclick="{!c.validation2}"></lightning:button>
+            <lightning:button variant="brand" label="{!v.MapView}" title="Map View" onclick="{!c.validation3}"></lightning:button>
+        <div  id="map1"  style = "align:right;height:500px;z-index:0 !important"> </div>
+            </div>
+    
+    
+
+</aura:component>

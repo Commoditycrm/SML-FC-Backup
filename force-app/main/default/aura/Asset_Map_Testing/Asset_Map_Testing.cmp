@@ -1,0 +1,21 @@
+<aura:component controller = "AssetLightningController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="newId" type="Id" />   
+    <aura:attribute name="map" type="Object"/>
+    <aura:attribute name="mapstyle" type="string"/>
+    
+    <aura:attribute name="latitude" type="decimal"/>
+    <aura:attribute name="longitude" type="decimal"/>
+    <aura:handler name = "init" value = "{!this}" action = "{!c.getuserLatLng}"/>
+    <aura:handler event="c:assetEvent" action="{!c.loadAsset}"/>
+    <ltng:require styles="{!$Resource.LeafletMarkerCluster + '/Leaflet.markercluster/dist/MarkerCluster.css'}" />
+    <ltng:require styles="{!$Resource.LeafletMarkerCluster + '/Leaflet.markercluster/dist/MarkerCluster.Default.css'}"/>  
+    
+    <ltng:require styles="{!$Resource.leaflet + '/leaflet/leaflet.css'}" />
+    <ltng:require scripts="{!join(',',$Resource.leaflet + '/leaflet/leaflet.js', $Resource.MarkerCluster)}" afterScriptsLoaded="{!c.jsLoaded}" />
+    <div class="slds-size_1-of-6" >
+        
+        <lightning:button name = "Home" label = "Home" variant = "brand" onclick = "{!c.refreshView}"/>
+        <lightning:button variant="brand" label="Satellite View" title="Satellite View" onclick="{!c.validation2}">Satellite View</lightning:button>
+       </div>
+    <div  id="map"  style = "{!v.mapstyle}"> </div>   
+</aura:component>

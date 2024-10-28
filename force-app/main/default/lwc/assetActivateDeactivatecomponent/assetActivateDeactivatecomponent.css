@@ -1,0 +1,35 @@
+.small-input-container {
+    max-width: 300px; /* Adjust the max-width as needed */
+    margin-left: 0; /* Align to the left */
+}
+
+.small-input-container lightning-input-field, 
+.small-input-container lightning-combobox {
+    width: 100%;
+}
+
+.slds-text-heading_medium {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #4a90e2; /* Adjust the color as needed */
+}
+
+.selected-devices-list {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr); /* 5 columns */
+    gap: 5px; /* Adjust the gap as needed */
+}
+
+.selected-devices-list li {
+    list-style-type: none; /* Remove default list style */
+}
+
+.button-container {
+    padding: 0 10px; /* Add padding to prevent buttons from touching the edge */
+}
+
+.blue-button .slds-button {
+    background-color: #0070d2; /* Salesforce blue */
+    color: #ffffff; /* White text */
+    border-color: #005fb2; /* Darker blue border */
+}

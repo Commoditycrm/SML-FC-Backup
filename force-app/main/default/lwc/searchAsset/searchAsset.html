@@ -1,0 +1,25 @@
+<template>
+    <lightning-card title="Select Assets" icon-name="standard:asset">
+        <div class="slds-p-around_medium">
+            <!-- Search box -->
+            <lightning-input 
+                label="Search Assets" 
+                placeholder="Search by Asset Name" 
+                value={searchKey} 
+                onchange={handleSearch}>
+            </lightning-input>
+
+            <!-- Checkbox Group for Asset Selection -->
+            <lightning-checkbox-group
+                label="Select Assets"
+                options={filteredAssets}
+                value={selectedAssets}
+                onchange={handleAssetSelection}>
+            </lightning-checkbox-group>
+        </div>
+
+        <template if:true={error}>
+            <p class="slds-text-color_error">Error: {error}</p>
+        </template>
+    </lightning-card>
+</template>

@@ -1,0 +1,15 @@
+<aura:component controller="RedesignAC_AccountBtn_to_NL_Controller" extends="c:LCC_GenericLightningComponent">
+    <aura:attribute name="isDisabled" type="Boolean" default="false"/>
+    <aura:attribute name="message" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}" />
+
+    <div class="slds-scrollable slds-p-around_medium slds-text-heading_small" id="modal-content-id-1">
+        <aura:if isTrue="{!v.isDisabled}">
+            <h2 class="slds-hyphenate slds-text-heading_medium">{!v.message}</h2>
+           <!-- <aura:set attribute="else">
+                <p class="slds-hyphenate">Confirm to start the process </p>
+                <lightning:button label="Execute" onclick="{!c.apexExecute}" />
+            </aura:set> -->
+        </aura:if>
+    </div>
+</aura:component>

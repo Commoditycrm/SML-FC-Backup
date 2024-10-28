@@ -1,0 +1,5 @@
+<aura:component controller="Trigger_Helper" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionwithoutheader" access="global" >
+     <aura:attribute name= "msg" type = "string"/>
+	 <lightning:button name = "Update Inventory" label = "Update Inventory" onclick = "{!c.Updateinventories}"/>
+   <ui:outputText value="{!v.msg}"/> 
+</aura:component>

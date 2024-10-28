@@ -1,0 +1,47 @@
+<aura:component controller = "AssetLightningController" implements="forceCommunity:availableForAllPageTypes" access="global" >
+    <aura:attribute name="ContactSupport" type="String" default="Contact Support"/>
+    <aura:attribute name="Logout" type="String" default="Logout"/>
+    <aura:attribute name="userLanguage" type="String" />
+    <aura:attribute name="toggleLabel" type="String" />
+     <aura:attribute name="emailtext" type="String" default="Questions? Email"/>
+    <aura:attribute name="isbutton" type="Boolean" default="false" />
+    <aura:attribute name="isEmail" type="Boolean" default="false" />
+    <aura:handler name = "init" value = "{!this}"  action="{!c.getuserLatLng}"/>
+    <!-- <aura:handler name = "init" value = "{!this}"  action="{!c.getuserpermission}"/> -->
+    <div class="slds-clearfix">
+        
+        
+        <div class="slds-grid slds-wrap slds-float_right">
+            <aura:if isTrue="{!v.isbutton}">
+                <div class="slds-col slds-p-right_small">
+                    <ui:button label="{!v.ContactSupport}" buttonTitle="Click here to see SMART Logistics support" press="{!c.Custom}" />
+                </div>
+            </aura:if>
+            
+            <aura:if isTrue="{!v.isEmail}">
+                <div class="slds-col slds-p-right_small slds-m-top_xx-small">
+                    <h1>{!v.emailtext} : <a href="mailto:TBartlett@amspower.com">TBartlett@amspower.com</a></h1>
+                </div>
+            </aura:if>
+            
+            <!-- Logout Button -->
+            <div class="slds-col">
+                <ui:button label="{!v.Logout}" press="{!c.logout}" />
+            </div>
+        </div>
+        
+        <!-- Clear float for next line -->
+        <div class="slds-clear"></div>
+        <aura:if isTrue="{!v.isEmail}">
+            <!-- Toggle Switch: Right-aligned on the next line -->
+           <!-- <div class="slds-float_right slds-m-top_small">
+                <lightning:input type="toggle" 
+                                 checked="false"
+                                 label="{!v.toggleLabel}"
+                                 onchange="{!c.handleLanguageToggle}" />
+            </div>-->
+        </aura:if>
+    </div> 
+    
+    
+</aura:component>

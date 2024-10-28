@@ -1,0 +1,64 @@
+<aura:component controller = "AssetLightningController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+<ltng:require styles="{!$Resource.LeafletMarkerCluster + '/Leaflet.markercluster/dist/MarkerCluster.css'}" />
+<ltng:require styles="{!$Resource.LeafletMarkerCluster + '/Leaflet.markercluster/dist/MarkerCluster.Default.css'}"/>  
+<ltng:require styles="{!$Resource.leaflet + '/leaflet/leaflet.css'}" />
+<ltng:require scripts="{!join(',',$Resource.leaflet + '/leaflet/leaflet.js', $Resource.MarkerCluster)}" afterScriptsLoaded="{!c.jsLoaded}" />
+
+<aura:attribute name="newId" type="Id" />   
+    <aura:attribute name="map" type="Object"/>
+    <aura:attribute name="mapstyle" type="string"/>
+    <aura:attribute name="latitude" type="decimal"/>
+    <aura:attribute name="longitude" type="decimal"/>
+    <aura:attribute name="assets" type="List"/>
+    <aura:attribute name="isMapLoaded" type="Boolean" default="false"/>
+    <aura:attribute name="isAssetsLoaded" type="Boolean" default="false"/>
+     <br /> 
+     <div class="slds-form-element">
+        <div class="label-wrapper">
+            <label class="slds-form-element__label" for="option">View</label>
+            <ui:inputSelect aura:id="option" class="slds-select" change="{!c.onPicklistChange}"/>
+        </div>
+    </div> 
+    <aura:attribute name="totalAssets" type="Integer" />
+    <aura:attribute name="loadedAssets" type="Integer" default="0" />
+    <aura:attribute name="showSpinner" type="string" default="false"/>
+    <aura:handler name = "init" value = "{!this}" action = "{!c.doinit}"/>
+    <!--aura:registerEvent name="assetLoad" type="c:assetEvent"/--> 
+    <aura:attribute name="totalAssetscount" type="Integer" default="0"/>
+    <aura:attribute name="groupedAssets" type="Integer" default="0"/>
+    <aura:attribute name="inTransitAssets" type="Integer" default="0"/>
+    <aura:attribute name="loadedAssetscount" type="Integer" default="0" />
+   
+    <aura:attribute name = "assetListcount" type = "Integer" default="0"/>
+    <aura:attribute name="progress" type="Integer" default="0"/>
+    <aura:attribute name="loadingMessage" type="String" default="Loading"/>
+
+    <br/>
+    <aura:if isTrue="{!v.showSpinner}">
+         <div class="loading-popup">
+            <div class="slds-modal__content">
+                <lightning:dynamicIcon type="ellie" alternativeText="Ellie intelligence"/>
+                {!v.loadingMessage}
+                
+             </div>
+             <img src="{!$Resource.progressgif}" alt="Progress Indicator" class="progress-bar-gif slds-m-left_small" />
+             <!--div class="progress-bar">
+                
+             </div-->
+        </div>
+	</aura:if>
+    <br />
+    
+    <aura:handler name = "init" value = "{!this}" action = "{!c.getuserLatLng}"/>
+    <!--aura:handler event="c:assetEvent" action="{!c.loadAsset}"/-->
+    <div class="slds-size_1-of-6" >
+        
+        <lightning:button name = "Home" label = "Home" variant = "brand" onclick = "{!c.refreshView}"/>
+        <lightning:button variant="brand" label="Satellite View" title="Satellite View" onclick="{!c.validation2}">Satellite View</lightning:button>
+        <lightning:button variant="brand" label="Map View" title="Map View" onclick="{!c.validation3}">Map View</lightning:button>
+    </div>
+    
+    
+    
+    <div  id="map"  style = "{!v.mapstyle}"> </div>   
+</aura:component>

@@ -1,0 +1,12 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<aura:attribute name="map" type="Object" default="null"/>
+    <aura:handler event="c:eventforbreadcrumbs" action="{!c.loadAsset}"/>
+
+       <ltng:require styles="{!$Resource.LeafletMarkerCluster + '/Leaflet.markercluster/dist/MarkerCluster.css'}" />
+    <ltng:require styles="{!$Resource.LeafletMarkerCluster + '/Leaflet.markercluster/dist/MarkerCluster.Default.css'}" />  
+    
+    <ltng:require styles="{!$Resource.leaflet + '/leaflet/leaflet.css'}" />
+    <ltng:require scripts="{!join(',',$Resource.leaflet + '/leaflet/leaflet.js', $Resource.MarkerCluster)}" afterScriptsLoaded="{!c.jsLoaded}" />
+    
+    <div  id="map"  style = "align:right;height:500px;z-index:0 !important"> </div>
+</aura:component>

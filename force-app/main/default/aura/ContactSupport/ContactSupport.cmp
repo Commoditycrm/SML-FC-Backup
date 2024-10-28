@@ -1,0 +1,7 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+	<div class="slds-clearfix">
+        <div class="slds-float_right">
+                        <ui:button label="Contact Support" press="{!c.logout}"/>
+    	</div>  
+    </div> 
+</aura:component>

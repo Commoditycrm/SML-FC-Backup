@@ -1,0 +1,70 @@
+<template>
+    <div class="slds-box slds-p-around_medium" style="background-color: white;">
+        <template if:false={outMsg}>
+            <div class="slds-box slds-p-around_medium" style="background-color: white;">
+                <h2 class="slds-text-heading_medium slds-p-bottom_medium">Select an Account</h2>
+                <lightning-record-edit-form object-api-name="Contact" id="createContactForm">
+                    <div class="small-input-container">
+                        <lightning-input-field field-name="AccountId" variant="label-hidden" onchange={handleAccountSelection} required></lightning-input-field>
+                    </div>
+                </lightning-record-edit-form>
+            </div>
+            <template if:true={selectedDevices.size}>
+                <p class="slds-p-horizontal_medium slds-p-vertical_small">Selected Devices:</p>
+                <ul class="slds-p-horizontal_medium slds-list_dotted selected-devices-list">
+                    <template for:each={selectedDevicesArray} for:item="device">
+                        <li key={device} class="slds-p-around_x-small">{device}</li>
+                    </template>
+                </ul>
+            </template>
+            <template if:true={accountId}>
+                <div class="slds-grid slds-grid_align-spread slds-m-bottom_small button-container">
+                    <lightning-button variant="neutral" label="Select All" onclick={handleSelectAll}></lightning-button>
+                    <lightning-button variant="neutral" label="DeSelect All" onclick={handleDeSelectAll}></lightning-button>
+                </div>
+
+                <lightning-card title="Asset Table" icon-name="standard:asset" class="slds-m-top_medium">
+                    <lightning-datatable
+                        key-field="Id"
+                        data={pagedData}
+                        columns={columns}
+                        selected-rows={selectedRowIds}
+                        onrowselection={getSelectedRows}
+                        hide-row-number-column="true"
+                        class="slds-m-top_small"
+                        data-id="assetTable"
+                    ></lightning-datatable>
+
+                    <div class="slds-m-top_medium slds-grid slds-grid_align-spread button-container">
+                        <lightning-button variant="neutral" label="Previous" onclick={handlePrevious} disabled={isFirstPage}></lightning-button>
+                        <lightning-button variant="neutral" label="Next" onclick={handleNext} disabled={isLastPage}></lightning-button>
+                    </div>
+                </lightning-card>
+            </template>
+
+            <template if:true={selectedDevices.size}>
+                <div class="slds-form-element slds-m-top_medium small-input-container">
+                    <lightning-combobox
+                        name="status"
+                        label="Select an Action"
+                        value={selectedStatus}
+                        placeholder="Select an option"
+                        options={statusOptions}
+                        onchange={handleStatusChange}
+                        class="slds-m-bottom_small"
+                    ></lightning-combobox>
+                </div>
+            </template>
+            
+            <template if:true={showActionButton}>
+                <button class="slds-button slds-button_neutral blue-button" onclick={handleActionButtonClick}>Click to {selectedStatus}</button>
+            </template>
+        </template>
+        <template if:true={outMsg}>
+            <div class="slds-box slds-p-around_medium" style="background-color: white;">
+                <p>{outMsg}</p>
+                <button class="slds-button slds-button_neutral blue-button" onclick={handleActionButtontorefreshScreen}>Home</button>
+            </div>
+        </template>
+    </div>
+</template>
