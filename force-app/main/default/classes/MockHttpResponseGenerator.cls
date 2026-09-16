@@ -10,7 +10,6 @@ global class MockHttpResponseGenerator implements HttpCalloutMock {
     global HTTPResponse respond(HTTPRequest req) {
         // Optionally, only send a mock response for a specific endpoint
         // and method.
-        //System.assertEquals('https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyCrly_ofyHrFUf70poqHLnWUblnTAOKn0o&latlng=40.12568900%20-90.15486000&sensor=true', req.getEndpoint());
         //System.assertEquals('GET', req.getMethod());
         
         HttpResponse res = new HttpResponse();
